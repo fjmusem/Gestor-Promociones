@@ -1,0 +1,613 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor Acciones B2B</title>
+    <!-- Load data -->
+    <script src="data.js"></script>
+    <style>
+        :root {
+            --ccu-green: #5AB031;
+            --ccu-dark-green: #0A4E31;
+            --bg-color: #f4f6f8;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            color: #333;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #ffffff;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            background-color: var(--ccu-dark-green);
+            color: white;
+        }
+
+        .sidebar-header h2 {
+            margin: 0 0 4px 0;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 14px 24px;
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            border-left: 4px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: #f9fafb;
+            color: var(--ccu-dark-green);
+        }
+
+        .nav-item.active {
+            background-color: #f0fdf4;
+            color: var(--ccu-dark-green);
+            border-left-color: var(--ccu-green);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Top Filters */
+        .top-filters {
+            background: #ffffff;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            z-index: 10;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background-color: #fff;
+            color: #374151;
+            font-size: 14px;
+            min-width: 140px;
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .filter-group select:focus {
+            border-color: var(--ccu-green);
+            box-shadow: 0 0 0 2px rgba(90, 176, 49, 0.2);
+        }
+
+        /* Content Area */
+        .content-scroll {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .section-title {
+            margin: 0 0 20px 0;
+            font-size: 1.5rem;
+            color: var(--ccu-dark-green);
+        }
+
+        /* Cards Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+                .card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card-cervezas { border: 4px solid #0A4E31; box-shadow: 0 0 10px rgba(10, 78, 49, 0.2); }
+        .card-eccusa { border: 4px solid #0056b3; box-shadow: 0 0 10px rgba(0, 86, 179, 0.2); }
+        .card-vspt { border: 4px solid #6f42c1; box-shadow: 0 0 10px rgba(111, 66, 193, 0.2); }
+        .card-cpch { border: 4px solid #c19a6b; box-shadow: 0 0 10px rgba(193, 154, 107, 0.2); }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: #fafafa;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-title {
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+            color: #111827;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-vigente { background: #dcfce7; color: #166534; }
+        .badge-novigente { background: #fee2e2; color: #991b1b; }
+        .badge-neutral { background: #f3f4f6; color: #374151; }
+
+                .card-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 13px;
+        }
+
+        .detail-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #111827;
+            font-weight: 600;
+            text-align: right;
+            max-width: 60%;
+        }
+
+        .price {
+            color: var(--ccu-dark-green);
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            background: #fff;
+            padding: 40px;
+            text-align: center;
+            border-radius: 12px;
+            border: 1px dashed var(--border-color);
+            color: #6b7280;
+        }
+
+        .empty-state h3 {
+            color: #374151;
+            margin-top: 0;
+        }
+
+        /* Coverage Table */
+        .ccu-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ccu-table th {
+            background: #f9fafb;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #4b5563;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .ccu-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: #111827;
+            font-size: 14px;
+        }
+
+        .ccu-table tr:hover {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Gestor Acciones B2B</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-item active" data-view="promociones">Promociones</a>
+            <a class="nav-item" data-view="incentivos">Incentivos</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Filters -->
+        <div class="top-filters" id="top-filters">
+            <!-- Dynamic filters will be injected here -->
+        </div>
+
+        <!-- Scrollable Cards Area -->
+        <div class="content-scroll">
+            <h2 class="section-title" id="view-title">Promociones Vigentes</h2>
+            <div class="card-grid" id="data-container">
+                <!-- Cards injected here -->
+            </div>
+        </div>
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Data from data.js
+    const dbOficinas = window.oficinas || [];
+    const dbPromociones = window.promociones || [];
+    const dbIncentivos = window.incentivos || [];
+
+    const mesesOrden = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const currentMonthName = mesesOrden[new Date().getMonth()];
+
+    // DOM Elements
+    const navItems = document.querySelectorAll('.nav-item');
+    const topFiltersContainer = document.getElementById('top-filters');
+    const dataContainer = document.getElementById('data-container');
+    const viewTitle = document.getElementById('view-title');
+
+    // App State
+        let state = {
+        view: 'promociones', // promociones, incentivos
+        mes: '',
+        canal: 'todas',
+        ocasion: 'todas',
+        categoria: 'todas',
+        zona: 'todas',
+        distrito: 'todas',
+        office: 'todas'
+    };
+
+    function init() {
+        // Initialize default month
+        let uniqueMeses = [...new Set(dbPromociones.map(p => p.mes).filter(Boolean))];
+        uniqueMeses.sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
+        
+        if (uniqueMeses.includes(currentMonthName)) {
+            state.mes = currentMonthName;
+        } else if (uniqueMeses.length > 0) {
+            state.mes = uniqueMeses[uniqueMeses.length - 1];
+        }
+
+        setupNavigation();
+        renderFilters();
+        renderData();
+    }
+
+    function setupNavigation() {
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                e.target.classList.add('active');
+                state.view = e.target.dataset.view;
+                
+                // Update Title
+                if (state.view === 'promociones') viewTitle.textContent = 'Promociones Vigentes';
+                else if (state.view === 'incentivos') viewTitle.textContent = 'Incentivos de Equipo';
+                else if (state.view === 'cobertura') viewTitle.textContent = 'Cobertura GeogrÃƒÂ¡fica';
+                
+                renderFilters();
+                renderData();
+            });
+        });
+    }
+
+    function getOptionsHTML(options, selectedValue, includeTodas) {
+        let html = includeTodas ? '<option value="todas">-- Todas --</option>' : '';
+        options.forEach(opt => {
+            const isSelected = opt.value === selectedValue ? 'selected' : '';
+            html += '<option value="' + opt.value + '" ' + isSelected + '>' + opt.label + '</option>';
+        });
+        return html;
+    }
+
+        function removeAccents(str) {
+        if (!str) return str;
+        return str.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function renderFilters() {
+        topFiltersContainer.innerHTML = '';
+
+        // Standard Filters (Promociones / Incentivos)
+        // 1. Mes
+        let uniqueMeses = [...new Set(dbPromociones.map(p => p.mes).filter(Boolean))];
+        uniqueMeses.sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
+        const mesOptions = uniqueMeses.map(m => ({value: m, label: removeAccents(m)}));
+
+        // 2. Canal
+        let dbDiccionario = window.diccionario || {};
+        let uniqueCanales = [...new Set(Object.values(dbDiccionario))];
+        dbPromociones.forEach(p => {
+            const arr = Array.isArray(p.canales_arr) ? p.canales_arr : [p.canales_arr];
+            arr.forEach(c => {
+                if (c && typeof c === 'string' && c !== '[object Object]' && !uniqueCanales.includes(c)) uniqueCanales.push(c);
+            });
+        });
+        const canalOptions = uniqueCanales.sort().map(c => ({value: c, label: removeAccents(c)}));
+
+                // 3. Ocasión (Dependent on Canal ONLY, ignores Mes)
+        let uniqueOcasiones = [];
+        if (state.canal === 'todas') {
+            uniqueOcasiones = Object.keys(dbDiccionario);
+        } else {
+            uniqueOcasiones = Object.keys(dbDiccionario).filter(k => dbDiccionario[k] === state.canal);
+        }
+        
+        // Agregamos las que vengan de las promociones (fallback por si no están en diccionario)
+        dbPromociones.forEach(p => {
+            if (state.canal !== 'todas') {
+                const cArr = Array.isArray(p.canales_arr) ? p.canales_arr : [p.canales_arr];
+                if (!cArr.includes(state.canal)) return;
+            }
+            const oArr = Array.isArray(p.ocasiones_arr) ? p.ocasiones_arr : [p.ocasiones_arr];
+            oArr.forEach(o => {
+                if (o && typeof o === 'string' && o !== '[object Object]' && !uniqueOcasiones.includes(o)) uniqueOcasiones.push(o);
+            });
+        });
+
+        const ocasionesOrden = Object.keys(dbDiccionario);
+        uniqueOcasiones = uniqueOcasiones.sort((a, b) => {
+            let idxA = ocasionesOrden.indexOf(a);
+            let idxB = ocasionesOrden.indexOf(b);
+            if(idxA === -1) idxA = 999;
+            if(idxB === -1) idxB = 999;
+            if(idxA === idxB) return a.localeCompare(b);
+            return idxA - idxB;
+        });
+
+        if (state.ocasion !== 'todas' && !uniqueOcasiones.includes(state.ocasion)) state.ocasion = 'todas';
+        const ocasionOptions = uniqueOcasiones.map(o => ({value: o, label: removeAccents(o)}));
+
+        // 4. Categoría
+        const categoriaOrden = ["Cervezas", "Eccusa", "CPCH", "VSPT"];
+        let uniqueCategorias = [...new Set(dbPromociones.map(p => p.categoria).filter(Boolean))];
+        uniqueCategorias.sort((a, b) => {
+            let idxA = categoriaOrden.findIndex(c => a.toLowerCase().includes(c.toLowerCase()));
+            let idxB = categoriaOrden.findIndex(c => b.toLowerCase().includes(c.toLowerCase()));
+            if(idxA === -1) idxA = 999;
+            if(idxB === -1) idxB = 999;
+            if(idxA === idxB) return a.localeCompare(b);
+            return idxA - idxB;
+        });
+        const categoriaOptions = uniqueCategorias.map(c => ({value: c, label: removeAccents(c)}));
+
+        // 5. Zona
+        const zonaOptions = [...new Set(dbOficinas.map(o => o.zona))].map(z => ({value: z, label: removeAccents(z)}));
+
+        // 6. Distrito (Dependent)
+        let filteredOficinas = dbOficinas;
+        if (state.zona !== 'todas') filteredOficinas = filteredOficinas.filter(o => o.zona === state.zona);
+        const newDistritos = [...new Set(filteredOficinas.map(o => o.distrito))];
+        if (state.distrito !== 'todas' && !newDistritos.includes(state.distrito)) { state.distrito = 'todas'; state.office = 'todas'; }
+        const distritoOptions = newDistritos.map(d => ({value: d, label: removeAccents(d)}));
+
+        // 6. Oficina (Dependent)
+        if (state.distrito !== 'todas') filteredOficinas = filteredOficinas.filter(o => o.distrito === state.distrito);
+        if (state.office !== 'todas' && !filteredOficinas.find(o => o.id === state.office)) state.office = 'todas';
+        
+        // Sort Oficinas numerically by ID
+        filteredOficinas.sort((a, b) => {
+            const numA = parseInt(a.id);
+            const numB = parseInt(b.id);
+            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+            return a.id.localeCompare(b.id);
+        });
+        
+        const officeOptions = filteredOficinas.map(o => ({value: o.id, label: o.id + ' - ' + removeAccents(o.nombre)}));
+
+                        // Build HTML
+                let html = '';
+        if (state.view === 'promociones') {
+            html += '<div class="filter-group"><label>Mes</label><select id="sel-mes">' + getOptionsHTML(mesOptions, state.mes, false) + '</select></div>';
+            html += '<div class="filter-group"><label>Categoría</label><select id="sel-categoria">' + getOptionsHTML(categoriaOptions, state.categoria, true) + '</select></div>';
+            html += '<div class="filter-group"><label>Canal</label><select id="sel-canal">' + getOptionsHTML(canalOptions, state.canal, true) + '</select></div>';
+            html += '<div class="filter-group"><label>Ocasión</label><select id="sel-ocasion">' + getOptionsHTML(ocasionOptions, state.ocasion, true) + '</select></div>';
+        }
+        
+        html += '<div class="filter-group"><label>Zona</label><select id="sel-zona">' + getOptionsHTML(zonaOptions, state.zona, true) + '</select></div>';
+        html += '<div class="filter-group"><label>Distrito</label><select id="sel-distrito">' + getOptionsHTML(distritoOptions, state.distrito, true) + '</select></div>';
+        html += '<div class="filter-group"><label>Oficina</label><select id="sel-office">' + getOptionsHTML(officeOptions, state.office, true) + '</select></div>';
+
+        topFiltersContainer.innerHTML = html;
+
+        // Attach Events
+        if (state.view === 'promociones') {
+            document.getElementById('sel-mes').addEventListener('change', e => { state.mes = e.target.value; renderFilters(); renderData(); });
+            document.getElementById('sel-categoria').addEventListener('change', e => { state.categoria = e.target.value; renderFilters(); renderData(); });
+            document.getElementById('sel-canal').addEventListener('change', e => { state.canal = e.target.value; renderFilters(); renderData(); });
+            document.getElementById('sel-ocasion').addEventListener('change', e => { state.ocasion = e.target.value; renderData(); });
+        }
+        document.getElementById('sel-zona').addEventListener('change', e => { state.zona = e.target.value; renderFilters(); renderData(); });
+        document.getElementById('sel-distrito').addEventListener('change', e => { state.distrito = e.target.value; renderFilters(); renderData(); });
+        document.getElementById('sel-office').addEventListener('change', e => { state.office = e.target.value; renderData(); });
+    }
+
+    function filterOffices(item) {
+        if (state.office !== 'todas') return (item.oficinas_ids || []).includes('todas') || (item.oficinas_ids || []).includes(state.office);
+        
+        // Find valid offices based on zona/distrito
+        let validOficinas = dbOficinas;
+        if (state.zona !== 'todas') validOficinas = validOficinas.filter(o => o.zona === state.zona);
+        if (state.distrito !== 'todas') validOficinas = validOficinas.filter(o => o.distrito === state.distrito);
+        const validIds = validOficinas.map(o => o.id);
+        
+        return (item.oficinas_ids || []).includes('todas') || (item.oficinas_ids || []).some(id => validIds.includes(id));
+    }
+
+    function renderData() {
+        dataContainer.innerHTML = '';
+        
+        if (state.view === 'promociones') {
+            const filtered = dbPromociones.filter(p => {
+                if (p.mes !== state.mes) return false;
+                if (state.categoria !== 'todas' && p.categoria !== state.categoria) return false;
+                if (state.canal !== 'todas' && !(Array.isArray(p.canales_arr) ? p.canales_arr : [p.canales_arr]).includes(state.canal)) return false;
+                if (state.ocasion !== 'todas' && !(Array.isArray(p.ocasiones_arr) ? p.ocasiones_arr : [p.ocasiones_arr]).includes(state.ocasion)) return false;
+                return filterOffices(p);
+            });
+
+            if (filtered.length === 0) {
+                dataContainer.innerHTML = '<div class="empty-state"><h3>No hay resultados</h3><p>No se encontraron promociones para estos filtros.</p></div>';
+                return;
+            }
+
+            filtered.forEach(p => {
+                const isVigente = p.mes === currentMonthName;
+                const badgeClass = isVigente ? 'badge-vigente' : 'badge-novigente';
+                const estado = isVigente ? 'Vigente' : 'No Vigente';
+                const pbadge = p.patente === 'Con Patente' ? 'badge-vigente' : 'badge-novigente';
+                const canales = Array.isArray(p.canales_arr) ? p.canales_arr.join(', ') : p.canales_arr;
+
+                let catLower = (p.categoria || '').toLowerCase();
+                let catClass = '';
+                if (catLower.includes('cervezas')) catClass = 'card-cervezas';
+                else if (catLower.includes('eccusa')) catClass = 'card-eccusa';
+                else if (catLower.includes('vspt')) catClass = 'card-vspt';
+                else if (catLower.includes('cpch')) catClass = 'card-cpch';
+
+                let cardHTML = '<div class="card ' + catClass + '"><div class="card-header" style="padding: 16px 16px 12px 16px;">';
+                cardHTML += '<div style="display:flex; justify-content:space-between; align-items:flex-start;">';
+                cardHTML += '<h3 class="card-title" style="margin: 0 0 10px 0; font-size: 1.1rem;">' + (p.producto || '') + '</h3>';
+                cardHTML += '<span class="badge ' + badgeClass + '" style="margin-left: 10px;">' + estado + '</span></div>';
+                
+                cardHTML += '<div style="display:flex; justify-content:space-between; align-items:center;">';
+                cardHTML += '<span class="badge badge-neutral">MES: ' + (p.mes || '').toUpperCase() + '</span>';
+                if (p.patente) {
+                    cardHTML += '<span class="badge ' + pbadge + '">' + p.patente + '</span>';
+                }
+                cardHTML += '</div></div><div class="card-body">';
+                
+                cardHTML += '<div style="display:flex; gap:10px;"><div class="detail-row" style="flex:1"><span class="detail-label">SKU:</span><span class="detail-value">' + (p.sku || '-') + '</span></div>';
+                cardHTML += '<div class="detail-row" style="flex:1"><span class="detail-label">Virtual:</span><span class="detail-value">' + (p.codVirtual || '-') + '</span></div></div>';
+                
+                cardHTML += '<div style="display:flex; gap:10px;"><div class="detail-row" style="flex:1"><span class="detail-label">Cat:</span><span class="detail-value" style="text-align:left;">' + (p.categoria || '-') + '</span></div>';
+                cardHTML += '<div class="detail-row" style="flex:1"><span class="detail-label">Canal:</span><span class="detail-value" style="text-align:right;">' + (canales || '-') + '</span></div></div>';
+                
+                cardHTML += '<div class="detail-row"><span class="detail-label">Ocasión:</span><span class="detail-value">' + (p.ocasion || '-') + '</span></div>';
+                
+                cardHTML += '<div class="detail-row" style="border-top:1px dashed #e5e7eb; padding-top:10px; margin-top:4px;"><span class="detail-label">Costo Entrega</span><span class="detail-value price">' + (p.costoEntrega || '0') + '</span></div>';
+                cardHTML += '</div></div>';
+
+                dataContainer.innerHTML += cardHTML;
+            });
+        } 
+        else if (state.view === 'incentivos') {
+            const filtered = dbIncentivos.filter(filterOffices);
+
+            if (filtered.length === 0) {
+                dataContainer.innerHTML = '<div class="empty-state"><h3>No hay resultados</h3><p>No se encontraron incentivos para estos filtros.</p></div>';
+                return;
+            }
+
+            filtered.forEach(i => {
+                let cardHTML = '<div class="card"><div class="card-header"><h3 class="card-title" style="margin:0">' + (i.mecanica || i.objetivo) + '</h3></div><div class="card-body">';
+                cardHTML += '<div class="detail-row"><span class="detail-label">Objetivo</span><span class="detail-value">' + (i.objetivo || '-') + '</span></div>';
+                cardHTML += '<div class="detail-row"><span class="detail-label">Premio</span><span class="detail-value price">' + (i.premio || '-') + '</span></div>';
+                cardHTML += '<div class="detail-row"><span class="detail-label">Vigencia</span><span class="detail-value">' + (i.periodo || '-') + '</span></div>';
+                cardHTML += '</div></div>';
+                dataContainer.innerHTML += cardHTML;
+            });
+        }
+    }
+
+    init();
+});
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
