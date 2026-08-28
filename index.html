@@ -579,7 +579,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             filtered.forEach(i => {
-                let cardHTML = '<div class="card"><div class="card-header"><h3 class="card-title" style="margin:0">' + (i.mecanica || i.objetivo) + '</h3></div><div class="card-body">';
+                const badgeClass = 'badge-vigente';
+                const dist = i.origen_distrito || 'Nacional';
+
+                let cardHTML = '<div class="card"><div class="card-header" style="padding: 16px 16px 12px 16px;">';
+                cardHTML += '<div style="display:flex; justify-content:space-between; align-items:flex-start;">';
+                cardHTML += '<h3 class="card-title" style="margin: 0 0 10px 0; font-size: 1.1rem;">' + (i.mecanica || i.objetivo) + '</h3>';
+                cardHTML += '<span class="badge ' + badgeClass + '" style="margin-left: 10px;">Vigente</span></div>';
+                
+                cardHTML += '<div style="display:flex; justify-content:space-between; align-items:center;">';
+                cardHTML += '<span class="badge badge-neutral">' + dist.toUpperCase() + '</span>';
+                cardHTML += '</div></div><div class="card-body">';
+
                 cardHTML += '<div class="detail-row"><span class="detail-label">Objetivo</span><span class="detail-value">' + (i.objetivo || '-') + '</span></div>';
                 cardHTML += '<div class="detail-row"><span class="detail-label">Premio</span><span class="detail-value price">' + (i.premio || '-') + '</span></div>';
                 cardHTML += '<div class="detail-row"><span class="detail-label">Vigencia</span><span class="detail-value">' + (i.periodo || '-') + '</span></div>';
@@ -594,6 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
 
