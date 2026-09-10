@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor Acciones B2B</title>
     <!-- Load data -->
-    <script src="data.js?v=178905733151961"></script>
+    <script src="data.js?v=178905927493998"></script>
     <style>
         :root {
             --ccu-green: #5AB031;
@@ -572,9 +572,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (catLower.includes('vspt')) catClass = 'card-vspt';
                 else if (catLower.includes('cpch')) catClass = 'card-cpch';
 
-                                let comentarioHtml = '';
-                if (p.comentario && p.comentario.toString().trim() !== '') {
-                    comentarioHtml = ' <span title="' + p.comentario.toString().replace(/"/g, '&quot;') + '" style="cursor:help; font-size:1.1rem; margin-left: 5px;">💬</span>';
+                                                let comentarioHtml = '';
+                if (p.comentario && p.comentario.toString().trim() !== '' && p.comentario.toString().trim() !== '-') {
+                    const icon = getCommentIcon(p.comentario.toString());
+                    comentarioHtml = '<span title="' + p.comentario.toString().replace(/"/g, '&quot;') + '" style="cursor:help; font-size:1.1rem; flex-shrink:0; margin-left: 5px;">' + icon + '</span>';
                 }
 
                                                 let cardHTML = '<div class="card ' + catClass + '"><div class="card-header" style="padding: 16px 16px 12px 16px;">';
@@ -653,6 +654,8 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
+
 
 
 
