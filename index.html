@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor Acciones B2B</title>
     <!-- Load data -->
-    <script src="data.js?v=178904753966471"></script>
+    <script src="data.js?v=178904805607136"></script>
     <style>
         :root {
             --ccu-green: #5AB031;
@@ -177,12 +177,18 @@
             align-items: flex-start;
         }
 
-        .card-title {
-            margin: 0 0 8px 0;
-            font-size: 1.1rem;
+                .card-title {
+            margin: 0 0 10px 0 !important;
+            font-size: 1.1rem !important;
             color: #111827;
             font-weight: 700;
             line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 2.6em; /* Fija la altura del titulo a exactamente 2 lineas */
         }
 
         .badge {
@@ -383,6 +389,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!str) return str;
         return str.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
+
+            function getCommentIcon(text) {
+            if (!text) return '&#128172;'; // 💬 default
+            const t = text.toLowerCase();
+            if (t.includes('r3') || t.includes('r4')) return '&#128666;'; // 🚚
+            if (t.includes('digital') || t.includes('app')) return '&#128241;'; // 📱
+            if (t.includes('urgente') || t.includes('importante')) return '&#128680;'; // 🚨
+            if (t.includes('regalo') || t.includes('premio')) return '&#127873;'; // 🎁
+            if (t.includes('semana 18') || t.includes('fiestas patrias') || t.includes('18')) return '&#127464;&#127473;'; // 🇨🇱
+            if (t.includes('navidad') || t.includes('viejito')) return '&#127876;'; // 🎄
+            if (t.includes('año nuevo') || t.includes('ano nuevo') || t.includes('añonuevo')) return '&#127879;'; // 🎆
+            return '&#128172;'; // 💬 default fallback
+        }
 
     function renderFilters() {
         topFiltersContainer.innerHTML = '';
@@ -615,6 +634,8 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
+
 
 
 
