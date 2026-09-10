@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor Acciones B2B</title>
     <!-- Load data -->
-    <script src="data.js?v=178792097117176"></script>
+    <script src="data.js?v=178904753966471"></script>
     <style>
         :root {
             --ccu-green: #5AB031;
@@ -544,9 +544,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (catLower.includes('vspt')) catClass = 'card-vspt';
                 else if (catLower.includes('cpch')) catClass = 'card-cpch';
 
+                                let comentarioHtml = '';
+                if (p.comentario && p.comentario.toString().trim() !== '') {
+                    comentarioHtml = ' <span title="' + p.comentario.toString().replace(/"/g, '&quot;') + '" style="cursor:help; font-size:1.1rem; margin-left: 5px;">💬</span>';
+                }
+
                 let cardHTML = '<div class="card ' + catClass + '"><div class="card-header" style="padding: 16px 16px 12px 16px;">';
                 cardHTML += '<div style="display:flex; justify-content:space-between; align-items:flex-start;">';
-                cardHTML += '<h3 class="card-title" style="margin: 0 0 10px 0; font-size: 1.1rem;">' + (p.producto || '') + '</h3>';
+                cardHTML += '<h3 class="card-title" style="margin: 0 0 10px 0; font-size: 1.1rem;">' + (p.producto || '') + comentarioHtml + '</h3>';
                 cardHTML += '<span class="badge ' + badgeClass + '" style="margin-left: 10px;">' + estado + '</span></div>';
                 
                 cardHTML += '<div style="display:flex; justify-content:space-between; align-items:center;">';
@@ -582,9 +587,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const badgeClass = 'badge-vigente';
                 const dist = i.origen_distrito || 'Nacional';
 
+                                let comentarioHtml = '';
+                if (i.comentario && i.comentario.toString().trim() !== '') {
+                    comentarioHtml = ' <span title="' + i.comentario.toString().replace(/"/g, '&quot;') + '" style="cursor:help; font-size:1.1rem; margin-left: 5px;">💬</span>';
+                }
+
                 let cardHTML = '<div class="card"><div class="card-header" style="padding: 16px 16px 12px 16px;">';
                 cardHTML += '<div style="display:flex; justify-content:space-between; align-items:flex-start;">';
-                cardHTML += '<h3 class="card-title" style="margin: 0 0 10px 0; font-size: 1.1rem;">' + (i.mecanica || i.objetivo) + '</h3>';
+                cardHTML += '<h3 class="card-title" style="margin: 0 0 10px 0; font-size: 1.1rem;">' + (i.mecanica || i.objetivo) + comentarioHtml + '</h3>';
                 cardHTML += '<span class="badge ' + badgeClass + '" style="margin-left: 10px;">Vigente</span></div>';
                 
                 cardHTML += '<div style="display:flex; justify-content:space-between; align-items:center;">';
@@ -605,6 +615,8 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
+
 
 
 
